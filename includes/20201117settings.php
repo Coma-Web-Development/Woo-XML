@@ -10,8 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Wooxml_Settings {
 
-    public $filename1 = 'woocommerce_products.xml';
-    public $filename2 = 'woocommerce_products_lv.xml';
+    public $filename = 'woocommerce_products.xml';
     public $folder = 'wooxml';
 
     /**
@@ -97,24 +96,6 @@ class Wooxml_Settings {
 
         $data = $this->wooxml_format_products();
 
-	$result = '';
-
-	$result1 = $this->wooxml_create_xml_file($this->filename2, $data['lv']);
-	$result .= 'XML LV: ';
-	if ($result1['error'] != '') $result .= $result1['error'];
-	if ($result1['url'] != '') $result .= $result1['url'];
-
-	$result .= "<br>";
-
-	$result2 = $this->wooxml_create_xml_file($this->filename1, $data['all']);
-	$result .= 'XML ALL: ';
-	if ($result2['error'] != '') $result .= $result2['error'];
-	if ($result2['url'] != '') $result .= $result2['url'];
-
-        return array('url' => $result);
-    }
-
-    private function wooxml_create_xml_file($filename, $data) {
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><root/>');
 
         foreach ( $data as $i => $product ) {
@@ -123,15 +104,22 @@ class Wooxml_Settings {
             foreach ( $product as $key => $value ) {
                 if( $value && $value != '' ) {
                     $item->addChild( $key, $value );
-                }                
-            }            
+                }
+                
+            }
+            
         }
 
+        //Header('Content-type: text/xml');
+        //print($xml->asXML());
+
         $file = $xml->asXML();
-        $result = $this->upload_xml_file( $filename, $file );
+        /*$file = str_replace('<?xml version="1.0"?>', '<?xml version="1.0" encoding="ISO-8859-1"?>', $file);*/
+        $result = $this->upload_xml_file( $file );
 
         return $result;
     }
+
 
 
     /**
@@ -142,14 +130,14 @@ class Wooxml_Settings {
     * @param string $file the file to write
     * @return string $filename
     */
-    private function upload_xml_file($filename, $file) {
+    private function upload_xml_file($file) {
 
         $deprecated = null;
         $time = current_time( 'mysql' );
 
         $upload_dir = wp_upload_dir();
         $base = $upload_dir['basedir'];
-        $file_path = $base . '/' . $this->folder . '/' . $filename;
+        $file_path = $base . '/' . $this->folder . '/' . $this->filename;
 
         $_filter = true; // For the anonymous filter callback below.
         add_filter( 'upload_dir', function( $arr ) use( &$_filter ){
@@ -163,8 +151,8 @@ class Wooxml_Settings {
         // delete if already exists
         wp_delete_file( $file_path );
 
-        $upload = wp_upload_bits( $filename, $deprecated, $file, $time );
-
+        $upload = wp_upload_bits( $this->filename, $deprecated, $file, $time );
+        
         $_filter = false; // Disables the filter.
 
         return $upload;
@@ -210,9 +198,7 @@ class Wooxml_Settings {
         if( ! $products['products'] )
             return;
 
-        $data_all = array();
-        $data_lv = array();
-
+        $data = array();
         foreach ( $products['products'] as $index => $post_id ) {
 
             $product = wc_get_product( $post_id );
@@ -230,24 +216,18 @@ class Wooxml_Settings {
             }
             $cat_link = get_term_link( $last_cat_id, 'product_cat' );
 
-	    $data = array();
-
-            $data['name'] = get_the_title( $post_id );
-            $data['link'] = get_permalink( $post_id );
-            $data['price'] = $product->get_price();
-            $data['image'] = get_the_post_thumbnail_url( $post_id, 'full' );
-            $data['manufacturer'] = $brand_names;
-            $data['category_full'] = $cat_names;
-            $data['category'] = $cat_name;
-            $data['category_link'] = $cat_link;
-
-	    $data_all[] = $data;
-
-	    if (strpos($data['link'], '/ru/') === false) $data_lv[] = $data;
+            $data[$index]['name'] = get_the_title( $post_id );
+            $data[$index]['link'] = get_permalink( $post_id );
+            $data[$index]['price'] = $product->get_price();
+            $data[$index]['image'] = get_the_post_thumbnail_url( $post_id, 'full' );
+            $data[$index]['manufacturer'] = $brand_names;
+            $data[$index]['category_full'] = $cat_names;
+            $data[$index]['category'] = $cat_name;
+            $data[$index]['category_link'] = $cat_link;
 
         }
 
-        return array('lv' => $data_lv, 'all' => $data_all);
+        return $data;
 
     }
 
