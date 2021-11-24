@@ -1,8 +1,9 @@
 <?php
 /**
  * Plugin Name: Woo XML
- * Description: Outputs XML of Woocommerce products.
- * Author: Brant Calder
+ * Description: Outputs XML of Woocommerce products for Salidzini.lv, KurPirkt.lv, Gudriem.lv.
+ * Author: Coma Web Development
+ * Author URI: https://coma.lv/?utm_source=woo-xml&utm_medium=link&utm_campaign=plugin-list-author
  * Version: 1.0.1
  * Text Domain: 'woo-xml'
  * Domain Path: languages

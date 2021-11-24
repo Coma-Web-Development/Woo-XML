@@ -96,7 +96,7 @@ class Wooxml_Settings {
 
         $data = $this->wooxml_format_products();
 
-        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><root/>');
+        $xml = new SimpleXMLElement('<root/>');
 
         foreach ( $data as $i => $product ) {
             $item = $xml->addChild( 'item' );
@@ -114,7 +114,7 @@ class Wooxml_Settings {
         //print($xml->asXML());
 
         $file = $xml->asXML();
-        /*$file = str_replace('<?xml version="1.0"?>', '<?xml version="1.0" encoding="ISO-8859-1"?>', $file);*/
+        $file = str_replace('<?xml version="1.0"?>', '<?xml version="1.0" encoding="ISO-8859-1"?>', $file);
         $result = $this->upload_xml_file( $file );
 
         return $result;
