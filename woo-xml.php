@@ -4,7 +4,7 @@
  * Description: Outputs XML of Woocommerce products for Salidzini.lv, KurPirkt.lv, Gudriem.lv.
  * Author: Coma Web Development
  * Author URI: https://coma.lv/?utm_source=woo-xml&utm_medium=link&utm_campaign=plugin-list-author
- * Version: 1.0.1
+ * Version: 1.0.2
  * Text Domain: 'woo-xml'
  * Domain Path: languages
  * 
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * Helper function for quick debugging
  */
 if (!function_exists('pp')) {
-	function pp( $array ) {
+function pp(array $array): void {
 		echo '<pre style="white-space:pre-wrap;">';
 			print_r( $array );
 		echo '</pre>' . "\n";
